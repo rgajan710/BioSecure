@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=biosecure
+      - DB_USER=postgres
+      - DB_PASSWORD=yourpassword
+    depends_on:
+      - db
+
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=biosecure
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=yourpassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  postgres_data:

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioSecure ID System</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-8">BioSecure ID System</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Registration Form -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Register Patient</h2>
+                <form id="registerForm" class="space-y-4">
+                    <div>
+                        <label class="block mb-1">Name</label>
+                        <input type="text" name="name" class="w-full border rounded p-2" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Contact</label>
+                        <input type="text" name="contact" class="w-full border rounded p-2" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Face Image</label>
+                        <input type="file" name="face" accept="image/*" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Fingerprint Image</label>
+                        <input type="file" name="fingerprint" accept="image/*" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Iris Image</label>
+                        <input type="file" name="iris" accept="image/*" required>
+                    </div>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        Register
+                    </button>
+                </form>
+            </div>
+
+            <!-- Identification Form -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Identify Patient</h2>
+                <form id="identifyForm" class="space-y-4">
+                    <div>
+                        <label class="block mb-1">Face Image</label>
+                        <input type="file" name="face" accept="image/*" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Fingerprint Image</label>
+                        <input type="file" name="fingerprint" accept="image/*" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">Iris Image</label>
+                        <input type="file" name="iris" accept="image/*" required>
+                    </div>
+                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                        Identify
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results" class="mt-8 bg-white p-6 rounded-lg shadow-md hidden">
+            <h2 class="text-xl font-semibold mb-4">Results</h2>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                showResults(data);
+            } catch (error) {
+                showResults({ status: 'error', message: error.message });
+            }
+        });
+
+        document.getElementById('identifyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            try {
+                const response = await fetch('/identify', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                showResults(data);
+            } catch (error) {
+                showResults({ status: 'error', message: error.message });
+            }
+        });
+
+        function showResults(data) {
+            const results = document.getElementById('results');
+            const content = document.getElementById('resultContent');
+            results.classList.remove('hidden');
+            content.innerHTML = `
+                <div class="${data.status === 'success' ? 'text-green-600' : 'text-red-600'}">
+                    <p class="font-semibold">${data.status.toUpperCase()}</p>
+                    <p>${data.message || JSON.stringify(data)}</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
